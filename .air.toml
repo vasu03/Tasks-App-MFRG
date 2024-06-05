@@ -1,0 +1,52 @@
+root = "."                                                # the root directory of the project
+testdata_dir = "testdata"
+tmp_dir = "tmp"                                           #  the temporary directory where air willstore its temporary files
+
+# The build confogurations for the air
+[build]   
+  args_bin = []
+  bin = "tmp\\main.exe"                                   # the name of the binary file to be generated after building the project
+  cmd = "go build -o ./tmp/main.exe ."                    # the command to build the project
+  delay = 500                                             # the delay for the air reload (in ms)
+  exclude_dir = ["assets", "tmp", "vendor", "testdata"]   # specifies the directories to be excluded from monitoring any changes for reload
+  exclude_file = []                                       # specifies the files to be excluded from monitoring any changes for reload
+  exclude_regex = ["_test.go"]                            # specifies the regex to be excluded from monitoring any changes for reload
+  exclude_unchanged = false
+  follow_symlink = false
+  full_bin = ""
+  include_dir = []                                        # specifies the directories to be included for monitoring any changes for reload
+  include_ext = ["go", "tpl", "tmpl", "html"]             # specifies the files with extension to be included for monitoring changes for reload
+  include_file = []                                       # specifies the files to be inlcuded for monitoring changes for reload
+  kill_delay = "0s"                                       # specifies the delay of killing the Air reload (in ms)
+  log = "build-errors.log"
+  poll = false
+  poll_interval = 0
+  post_cmd = []
+  pre_cmd = []
+  rerun = false
+  rerun_delay = 500
+  send_interrupt = false
+  stop_on_error = false
+
+[color]
+  app = ""
+  build = "yellow"
+  main = "magenta"
+  runner = "green"
+  watcher = "cyan"
+
+[log]
+  main_only = false
+  time = false
+
+[misc]
+  clean_on_exit = false
+
+[proxy]
+  app_port = 0
+  enabled = false
+  proxy_port = 0
+
+[screen]
+  clear_on_rebuild = false
+  keep_scroll = true
