@@ -27,6 +27,9 @@ const Navbar = () => {
 						<Button onClick={toggleColorMode}>
 							{colorMode === "light" ? <IoMoon /> : <LuSun size={20} />}
 						</Button>
+						<Button >
+							LogOut
+						</Button>
 					</Flex>
 				</Flex>
 			</Box>

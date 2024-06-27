@@ -4,8 +4,11 @@ import { Badge, Box, Flex, Text } from "@chakra-ui/react";
 import { FaCheckCircle } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
 
+// Importing custom components
+import { Todo } from "./ToDoList";
+
 // Creating a ToDo Item component
-const TodoItem = ({ todo }: { todo: any }) => {
+const TodoItem = ({ todo }: { todo: Todo }) => {
 	// TSX to render ToDo Item component
     return (
 		<Flex gap={2} alignItems={"center"}>

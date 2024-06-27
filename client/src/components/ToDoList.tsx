@@ -1,41 +1,44 @@
 // Importing required modules
-import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 // Importing Chakra UI component
 import { Flex, Spinner, Stack, Text } from "@chakra-ui/react";
 // Importing our custom components
 import TodoItem from "./ToDoItem";
 
-// /Creating the ToDo List component
-const TodoList = () => {
-    // State to handle the loading
-	const [isLoading, setIsLoading] = useState(true);
-	const todos = [
-		{
-			_id: 1,
-			body: "Buy groceries",
-			completed: true,
-		},
-		{
-			_id: 2,
-			body: "Walk the dog",
-			completed: false,
-		},
-		{
-			_id: 3,
-			body: "Do laundry",
-			completed: false,
-		},
-		{
-			_id: 4,
-			body: "Cook dinner",
-			completed: true,
-		},
-	];
 
-    // TSX to render the ToDo List
+// Creating a base type of a ToDo Item
+export type Todo = {
+	_id: number;
+	body: string;
+	completed: boolean;
+}
+
+
+// Creating the ToDo List component
+const TodoList = () => {
+
+	// Initialising the react-query hook to fetch data
+	const { data: todos, isLoading } = useQuery<Todo[]>({
+		queryKey: ["todos"],
+		queryFn: async () => {
+			try {
+				const res = await fetch("http://localhost:4000/api/tasks/getTasks");
+				const data = await res.json();
+				if (!res.ok) {
+					toast.error(data.error);
+				}
+				return data || [];
+			} catch (err) {
+				console.log(err);
+			}
+		}
+	});
+
+	// TSX to render the ToDo List
 	return (
 		<>
-			<Text fontSize={"4xl"} textTransform={"uppercase"} fontWeight={"bold"} textAlign={"center"} my={2}>
+			<Text fontSize={"4xl"} textTransform={"uppercase"} fontWeight={"bold"} textAlign={"center"} my={2} bgGradient='linear(to-r, green.400, blue.400)' bgClip="text">
 				Today's Tasks
 			</Text>
 			{isLoading && (

@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -62,6 +63,11 @@ func main() {
 	
 	// Creating a new Fiber app //
 	app := fiber.New()
+	// Setting up the Cors
+	app.Use(cors.New(cors.Config{
+		AllowOrigins: os.Getenv("CLIENT_ORIGIN"),
+		AllowHeaders: "Origin,Content-Type,Accept",
+	}))
 
 	// Defining different routes of the app //
 	app.Get("/api/tasks/getTasks", getTasks)
