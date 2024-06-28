@@ -1,5 +1,8 @@
+// Importing required modules
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 // Importing Chakra UI components
-import { Badge, Box, Flex, Text } from "@chakra-ui/react";
+import { Badge, Box, Flex, Spinner, Text } from "@chakra-ui/react";
 // Importing React-icons
 import { FaCheckCircle } from "react-icons/fa";
 import { MdDelete } from "react-icons/md";
@@ -9,8 +12,38 @@ import { Todo } from "./ToDoList";
 
 // Creating a ToDo Item component
 const TodoItem = ({ todo }: { todo: Todo }) => {
+	// Get query client
+	const queryClient = useQueryClient();
+
+	// Initialising the react-query hook
+	const { mutate: updateTodo, isPending: isUpdating } = useMutation({
+		mutationKey: ["updateTodo"],
+		mutationFn: async () => {
+			if (todo.completed)
+				return toast("Task already completed.");
+
+			try {
+				const res = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/tasks/updateTask/${todo._id}`, {
+					method: "PATCH"
+				});
+				const data = await res.json();
+				if (!res.ok) {
+					toast.error(data.error);
+				}
+				toast.success("Task completed.")
+				return data;
+			} catch (error) {
+				console.log(error);
+			}
+		},
+		onSuccess: () => {
+			// Update the local cache to avoid refreshing for fetching 
+			queryClient.invalidateQueries({ queryKey: ["todos"] });
+		}
+	});
+
 	// TSX to render ToDo Item component
-    return (
+	return (
 		<Flex gap={2} alignItems={"center"}>
 			<Flex
 				flex={1}
@@ -39,8 +72,9 @@ const TodoItem = ({ todo }: { todo: Todo }) => {
 				)}
 			</Flex>
 			<Flex gap={2} alignItems={"center"}>
-				<Box color={"green.400"} cursor={"pointer"}>
-					<FaCheckCircle size={20} />
+				<Box color={"green.400"} cursor={"pointer"} onClick={() => updateTodo()}>
+					{!isUpdating && <FaCheckCircle size={20} />}
+					{isUpdating && <Spinner size={"sm"} />}
 				</Box>
 				<Box color={"red.400"} cursor={"pointer"}>
 					<MdDelete size={25} />

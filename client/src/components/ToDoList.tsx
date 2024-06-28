@@ -17,13 +17,12 @@ export type Todo = {
 
 // Creating the ToDo List component
 const TodoList = () => {
-
 	// Initialising the react-query hook to fetch data
 	const { data: todos, isLoading } = useQuery<Todo[]>({
 		queryKey: ["todos"],
 		queryFn: async () => {
 			try {
-				const res = await fetch("http://localhost:4000/api/tasks/getTasks");
+				const res = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/tasks/getTasks`);
 				const data = await res.json();
 				if (!res.ok) {
 					toast.error(data.error);
