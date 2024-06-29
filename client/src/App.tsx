@@ -10,7 +10,7 @@ import { Toaster } from "react-hot-toast";
 const App = () => {
   // TSX to render our App
   return (
-    <Stack h="100vh">
+    <Stack h="100vh" overflow={"hidden"}>
       <Navbar />
       <Container>
         <ToDoForm />

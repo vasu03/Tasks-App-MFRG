@@ -1,8 +1,10 @@
 // Importing required modules
 import { useQuery } from "@tanstack/react-query";
 import toast from "react-hot-toast";
+
 // Importing Chakra UI component
 import { Flex, Spinner, Stack, Text } from "@chakra-ui/react";
+
 // Importing our custom components
 import TodoItem from "./ToDoItem";
 
@@ -19,14 +21,20 @@ export type Todo = {
 const TodoList = () => {
 	// Initialising the react-query hook to fetch data
 	const { data: todos, isLoading } = useQuery<Todo[]>({
+		// key to identify the query output
 		queryKey: ["todos"],
+		// function to execute while querying for fetching data
 		queryFn: async () => {
 			try {
+				// send a response to the server
 				const res = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/tasks/getTasks`);
+				// get the data back from the server
 				const data = await res.json();
+				// if the response is not ok then show error
 				if (!res.ok) {
 					toast.error(data.error);
 				}
+				// else return data or a empty error
 				return data || [];
 			} catch (err) {
 				console.log(err);
@@ -52,7 +60,7 @@ const TodoList = () => {
 					</Text>
 				</Stack>
 			)}
-			<Stack gap={3}>
+			<Stack gap={3} overflowY={"scroll"} height={"65%"}>
 				{todos?.map((todo) => (
 					<TodoItem key={todo._id} todo={todo} />
 				))}
