@@ -33,6 +33,7 @@ func main() {
 	app.Use(cors.New(cors.Config{
 		AllowOrigins: os.Getenv("CLIENT_ORIGIN"),
 		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowCredentials: true,
 	}))
 
 	// Setting up the custom middlewares //

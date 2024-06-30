@@ -1,7 +1,7 @@
 // Declaring the Controllers package
 package controllers
 
-// Importing the required modules //
+// Importing the required modules
 import (
 	"context"
 	"os"
@@ -21,6 +21,7 @@ import (
 
 // Getting the secret for JWT
 var jwtSecret []byte
+
 func init() {
 	// Load environment variables from .env file
 	err := godotenv.Load()
@@ -31,18 +32,17 @@ func init() {
 	jwtSecret = []byte(os.Getenv("JWT_SECRET"))
 }
 
-// HashPassword hashes the given password //
+// HashPassword hashes the given password
 func HashPassword(password string) (string, error) {
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
 	return string(bytes), err
 }
 
-// CheckPasswordHash checks if the given password matches the hashed password //
+// CheckPasswordHash checks if the given password matches the hashed password
 func CheckPasswordHash(password, hash string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
 	return err == nil
 }
-
 
 // = = = User Signup handler for user registration = = = //
 func Signup(c *fiber.Ctx) error {
@@ -80,14 +80,19 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Error creating user"})
 	}
 
-	// If everything goes well then send the user as response
-	return c.Status(201).JSON(user)
-}
+	// If everything goes well then send the user as response without password
+	userResponse := fiber.Map{
+		"id":    user.ID,
+		"username":  user.Username,
+		"email": user.Email,
+	}
 
+	return c.Status(201).JSON(userResponse)
+}
 
 // = = = User Login handler for user authentication = = = //
 func Login(c *fiber.Ctx) error {
-	// Declare a default data as per type struct User 
+	// Declare a default data as per type struct User
 	loginData := new(models.User)
 
 	// Parse the request body to the loginData model
@@ -130,19 +135,27 @@ func Login(c *fiber.Ctx) error {
 		Value:    tokenString,
 		Expires:  time.Now().Add(1 * time.Hour),
 		HTTPOnly: true,
-		Secure: true,
+		Secure:   false,
+		SameSite: "Lax",
+		Path:     "/",
 	})
 
-	// If everythingis fine then send the logged user as response
-	return c.Status(200).JSON(user)
-}
+	// If everything is fine then send the logged user as response without password
+	userResponse := fiber.Map{
+		"id":    user.ID,
+		"username":  user.Username,
+		"email": user.Email,
+	}
 
+	return c.Status(200).JSON(userResponse)
+}
 
 // = = = User Logout handler for user logout = = = //
 func Logout(c *fiber.Ctx) error {
 	// Clear the JWT token cookie
 	cookie := new(fiber.Cookie)
 	cookie.Name = "token"
+	cookie.Path = "/"
 	cookie.Value = ""
 	cookie.Expires = time.Now().Add(-1 * time.Hour)
 	c.Cookie(cookie)

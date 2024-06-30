@@ -4,8 +4,7 @@ package controllers
 // Importing the required modules //
 import (
 	"context"
-	"fmt"
-
+	
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson"
@@ -21,8 +20,6 @@ func getUserIDFromToken(c *fiber.Ctx) (primitive.ObjectID, error) {
 	userToken := c.Locals("user").(*jwt.Token)
 	claims := userToken.Claims.(jwt.MapClaims)
 	userID, err := primitive.ObjectIDFromHex(claims["userId"].(string))
-	fmt.Println("userID", userID)
-	fmt.Println("userToken", userToken)
 	return userID, err
 }
 

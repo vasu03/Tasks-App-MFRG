@@ -20,7 +20,7 @@ func Logger() fiber.Handler {
         stop := time.Now()
 
 		// print the details of request to Terminal
-        log.Printf("[%s] [%s] [%s] [%d] [%s]\n", c.IP(), c.Method(), c.Path(), c.Response().StatusCode(), stop.Sub(start))
+        log.Printf("[ %s ] [ %s ] [ %s ] [ %d ] [ %s ]\n", c.IP(), c.Method(), c.Path(), c.Response().StatusCode(), stop.Sub(start))
 
 		// return if there is any error
         return err
