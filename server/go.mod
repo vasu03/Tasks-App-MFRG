@@ -1,4 +1,4 @@
-module github.com/vasu03/Tasks-App-MFRG
+module github.com/vasu03/Tasks-App-MFRG/server
 
 go 1.20
 
@@ -9,7 +9,9 @@ require (
 
 require (
 	github.com/andybalholm/brotli v1.0.5 // indirect
-	github.com/golang/snappy v0.0.1 // indirect
+	github.com/gofiber/jwt/v2 v2.2.7 // indirect
+	github.com/golang-jwt/jwt/v4 v4.5.0 // indirect
+	github.com/golang/snappy v0.0.3 // indirect
 	github.com/google/uuid v1.5.0 // indirect
 	github.com/klauspost/compress v1.17.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
