@@ -30,7 +30,8 @@ const TodoItem = ({ todo }: { todo: Todo }) => {
 			try {
 				// send a response to server
 				const res = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/tasks/updateTask/${todo._id}`, {
-					method: "PATCH"
+					method: "PATCH",
+					credentials: 'include'
 				});
 				// capture the data from the server
 				const data = await res.json();
@@ -58,13 +59,11 @@ const TodoItem = ({ todo }: { todo: Todo }) => {
 		mutationKey: ["deleteTodo"],
 		// a function for the mutate
 		mutationFn: async () => {
-			if (todo.completed)
-				return toast("Task already completed.");
-			// updating the todo to completed state
 			try {
 				// send a response to server
 				const res = await fetch(`${import.meta.env.VITE_APP_BASE_URL}/api/tasks/deleteTask/${todo._id}`, {
-					method: "DELETE"
+					method: "DELETE",
+					credentials: 'include'
 				});
 				// capture the data from the server
 				const data = await res.json();
@@ -89,12 +88,14 @@ const TodoItem = ({ todo }: { todo: Todo }) => {
 	
 	// TSX to render ToDo Item component
 	return (
-		<Flex gap={2} alignItems={"center"} >
+		<Flex gap={{base:.5 ,sm:2}} alignItems={"center"} flexDirection={{ base: "column", sm: "row" }} border={{base: "1px", sm:"none"}} borderColor={{base:"gray.600"}} borderRadius={"lg"} >
 			<Flex
 				flex={1}
+				flexDirection={{ base: "column", sm: "row" }}
+				gap={{ base: ".3rem", sm: "0" }}
 				alignItems={"center"}
-				border={"1px"}
-				borderColor={"gray.600"}
+				border={{sm: "1px"}}
+				borderColor={{sm:"gray.600"}}
 				p={2}
 				borderRadius={"lg"}
 				justifyContent={"space-between"}
@@ -102,16 +103,19 @@ const TodoItem = ({ todo }: { todo: Todo }) => {
 				<Text
 					color={todo.completed ? "green.400" : "red.300"}
 					textDecoration={todo.completed ? "line-through" : "none"}
+					display={"flex"}
+					borderBottom={{ base: "1px", sm: "none" }}
+					borderColor={"gray.600"}
 				>
 					{todo.body}
 				</Text>
 				{todo.completed && (
-					<Badge ml='1' colorScheme='green'>
+					<Badge letterSpacing={".05rem"} fontWeight={"400"} ml='1' colorScheme='green'>
 						Done
 					</Badge>
 				)}
 				{!todo.completed && (
-					<Badge ml='1' colorScheme='red'>
+					<Badge letterSpacing={".05rem"} fontWeight={"400"} ml='1' colorScheme='red'>
 						Pending
 					</Badge>
 				)}

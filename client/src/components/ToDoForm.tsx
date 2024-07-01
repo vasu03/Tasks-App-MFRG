@@ -35,7 +35,8 @@ const TodoForm = () => {
 					headers: {
 						"Content-Type": "application/json"
 					},
-					body: JSON.stringify({ body: newTodo })
+					body: JSON.stringify({ body: newTodo }),
+					credentials: 'include'
 				});
 				// capture the data from the server
 				const data = await res.json();
@@ -67,12 +68,13 @@ const TodoForm = () => {
 					e.preventDefault();
 					createTodo()
 				} }
-			style={{ marginTop: "1.5rem" }}
+			style={{ marginTop: "1rem" }}
 		>
 			<Flex gap={2}>
 				<Input
 					type='text'
 					value={newTodo}
+					placeholder="Add new task here..."
 					borderColor="gray.500"
 					onChange={(e) => setNewTodo(e.target.value)}
 					ref={(input) => input && input.focus()}
