@@ -80,11 +80,33 @@ func Signup(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Error creating user"})
 	}
 
+	// Create JWT token for authentication
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
+		"userId": user.ID.Hex(),
+		"exp":    time.Now().Add(time.Hour * 1).Unix(),
+	})
+
+	// generate a token string using the secret
+	tokenString, err := token.SignedString(jwtSecret)
+	if err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Error creating JWT token"})
+	}
+
+	// Set the generated token as a cookie
+	c.Cookie(&fiber.Cookie{
+		Name:     "token",
+		Value:    tokenString,
+		Expires:  time.Now().Add(1 * time.Hour),
+		HTTPOnly: true,
+		Secure:   false,
+		SameSite: "Lax",
+		Path:     "/",
+	})
+
 	// If everything goes well then send the user as response without password
 	userResponse := fiber.Map{
 		"id":    user.ID,
 		"username":  user.Username,
-		"email": user.Email,
 	}
 
 	return c.Status(201).JSON(userResponse)
@@ -144,7 +166,6 @@ func Login(c *fiber.Ctx) error {
 	userResponse := fiber.Map{
 		"id":    user.ID,
 		"username":  user.Username,
-		"email": user.Email,
 	}
 
 	return c.Status(200).JSON(userResponse)

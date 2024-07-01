@@ -4,16 +4,17 @@ package controllers
 // Importing the required modules //
 import (
 	"context"
-	
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v4"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
 	"github.com/vasu03/Tasks-App-MFRG/server/database"
 	"github.com/vasu03/Tasks-App-MFRG/server/models"
 )
-
 
 // Helper function to get user ID from JWT token //
 func getUserIDFromToken(c *fiber.Ctx) (primitive.ObjectID, error) {
@@ -26,7 +27,7 @@ func getUserIDFromToken(c *fiber.Ctx) (primitive.ObjectID, error) {
 
 // = = = Defining a controller func for Getting all Tasks = = = //
 func GetTasks(c *fiber.Ctx) error {
-	// create a array of Tasks of type TODO struct defined in our DB model
+	// Create an array of Tasks of type TODO struct defined in our DB model
 	var tasks []models.Todo
 
 	// Get the user ID from the token
@@ -35,26 +36,33 @@ func GetTasks(c *fiber.Ctx) error {
 		return c.Status(500).JSON(fiber.Map{"error": "Failed to get user ID from token"})
 	}
 
-	// Fetch all the tasks for the specific user
+	// Fetch all the tasks for the specific user and sort them by createdAt in descending order
 	filter := bson.M{"userId": userID}
-	cursor, err := database.TaskCollection.Find(context.Background(), filter)
-	// if the fetching of tasks is not done then return error
+	findOptions := options.Find()
+	findOptions.SetSort(bson.D{{Key: "createdAt", Value: -1}})
+
+	cursor, err := database.TaskCollection.Find(context.Background(), filter, findOptions)
+	// If the fetching of tasks is not done then return error
 	if err != nil {
-		return err
+		return c.Status(500).JSON(fiber.Map{"error": "Failed to fetch tasks"})
 	}
 
 	// Close the cursor connection when work is done
-	// defer will postpone the execution of this line until the surrounding function(getTasks()) call is executed
+	// Defer will postpone the execution of this line until the surrounding function (GetTasks) call is executed
 	defer cursor.Close(context.Background())
 
-	// if all tasks fetched then iterate over them
+	// If all tasks fetched then iterate over them
 	for cursor.Next(context.Background()) {
 		var task models.Todo
 		if err := cursor.Decode(&task); err != nil {
-			return err
+			return c.Status(500).JSON(fiber.Map{"error": "Failed to decode task"})
 		}
-		// append the task obtained from cursor into TODO (tasks[])
+		// Append the task obtained from cursor into TODO (tasks[])
 		tasks = append(tasks, task)
+	}
+	// Check for cursor errors after iteration
+	if err := cursor.Err(); err != nil {
+		return c.Status(500).JSON(fiber.Map{"error": "Cursor error"})
 	}
 	// Send the fetched tasks as a response
 	return c.Status(200).JSON(tasks)
@@ -63,7 +71,7 @@ func GetTasks(c *fiber.Ctx) error {
 
 // = = = Defining a controller func for Creating new Tasks = = = //
 func CreateTask(c *fiber.Ctx) error {
-	// create a new default task => {id: 0, completed: false, body: ""}
+	// Create a new default task => {id: 0, completed: false, body: ""}
 	task := new(models.Todo)
 
 	// Parse the body of the task created by the user and if any error then show it
@@ -71,7 +79,7 @@ func CreateTask(c *fiber.Ctx) error {
 		return err
 	}
 
-	// check if the Body of Task is empty in BODY
+	// Check if the Body of Task is empty
 	if task.Body == "" {
 		return c.Status(400).JSON(fiber.Map{"error": "Task must have a non-empty Body."})
 	}
@@ -85,16 +93,19 @@ func CreateTask(c *fiber.Ctx) error {
 	// Assign the user ID to the task
 	task.UserID = userID
 
+	// Set the CreatedAt field to the current time
+	task.CreatedAt = time.Now()
+
 	// If everything is fine then insert the task into DB
 	insertedTask, err := database.TaskCollection.InsertOne(context.Background(), task)
 	if err != nil {
 		return err
 	}
 
-	// update the task id every time a new task is created
+	// Update the task ID every time a new task is created
 	task.ID = insertedTask.InsertedID.(primitive.ObjectID)
 
-	// if everything is fine then return the created task as response
+	// If everything is fine then return the created task as response
 	return c.Status(201).JSON(task)
 }
 

@@ -2,7 +2,11 @@
 package models
 
 // Importing required modules //
-import "go.mongodb.org/mongo-driver/bson/primitive"
+import (
+	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
+)
 
 // Defining a struct to store our TODO Tasks //
 type Todo struct {
@@ -10,4 +14,5 @@ type Todo struct {
 	Completed bool               `json:"completed"`
 	Body      string             `json:"body"`
 	UserID    primitive.ObjectID `json:"userId" bson:"userId"`
+	CreatedAt time.Time          `json:"createdAt" bson:"createdAt"`
 }
