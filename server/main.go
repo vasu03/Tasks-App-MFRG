@@ -18,9 +18,11 @@ import (
 // = = = Declaring Main method (compulsory) = = = //
 func main() {
 	// Loading the .env files //
-	err := godotenv.Load(".env")
-	if err != nil {
-		log.Fatal("Error loading .env file", err)
+	if os.Getenv("APP_ENV") != "production" {
+		err := godotenv.Load(".env")
+		if err != nil {
+			log.Fatal("Error loading .env file", err)
+		}
 	}
 
 	// Setting up the connection with the database //
@@ -31,8 +33,8 @@ func main() {
 
 	// Setting up predefined middlewares //
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: os.Getenv("CLIENT_ORIGIN"),
-		AllowHeaders: "Origin, Content-Type, Accept",
+		AllowOrigins:     os.Getenv("CLIENT_ORIGIN"),
+		AllowHeaders:     "Origin, Content-Type, Accept",
 		AllowCredentials: true,
 	}))
 
@@ -49,6 +51,12 @@ func main() {
 	if PORT == "" {
 		PORT = "3000"
 	}
+
+	// Make the Client app as static when in production
+	if os.Getenv("APP_ENV") == "production" {
+		app.Static("/", "../client/dist")
+	}
+
 	// Start the Fiber app at given Port
 	fmt.Println("Server is up & running...")
 	log.Fatal(app.Listen("localhost:" + PORT))
